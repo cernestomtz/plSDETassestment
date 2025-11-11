@@ -106,7 +106,7 @@
 
 
 ## Bug ID: UI-005 
-**Title:** Add Employee template does not have validations
+**Title:** Add Employee template does not have validations message
 **Scenario:** 1 Add Employee
 
 **Severity:** Medium  
@@ -225,7 +225,7 @@
 
 
 ### Actual Result:
-- New entries does not follow logical order
+- New entries get in order for ID, which not make business sense
 
 ### Expected Result:
 - New entries should follow logical order (for example: from first to last, from last to first, alphabetical order, and others)
