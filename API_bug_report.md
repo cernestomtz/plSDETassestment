@@ -36,7 +36,7 @@ The API should validate the payload against the Employee schema. However, it acc
 
 
 ## Bug ID: API-002  
-**Title:** PUT /api/Employees creates a new record when the provided ID does not exist and allows salary = 0, resulting in negative net pay  
+**Title:** PUT /api/Employees creates a new record when the provided ID was previously deleted and set salary = 0, resulting in negative net pay  
 **Scenario:** 2 Edit Employee
 
 **Severity:** Medium    
@@ -47,7 +47,7 @@ The API should validate the payload against the Employee schema. However, it acc
 **Date:** 2025-11-11  
 
 **Description:**  
-When sending a PUT request to edit an employee using an ID that has been deleted or never existed, the API creates a new employee (upsert behavior), ignoring the provided ID.  
+When sending a PUT request to edit an employee using an ID that has been deleted, the API creates a new employee (upsert behavior), ignoring the provided ID.  
 Additionally, the API set a salary 0, which got into to invalid payroll calculations, a positive Benefits Cost and a negative Net Pay shown in the UI.  
 
 This violates both RESTful conventions (PUT should be idempotent and only update existing resources) and business rules (Net Pay should never be negative).
@@ -84,3 +84,98 @@ This violates both RESTful conventions (PUT should be idempotent and only update
 
 ### Notes:
 - None
+
+
+## Bug ID: API-003  
+**Title:** POST /api/Employees creates a new employee without verify that a valid user is who create the record   
+**Scenario:** 1 Add Employee
+
+**Severity:** Medium    
+**Endpoint:** https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/Employees
+**Method:** POST
+**Auth:** Basic Auth Header
+**Reported by:** Ernesto Martínez  
+**Date:** 2025-11-12  
+
+**Description:**  
+When sending a POST request with a non existing user name, the call is still reponse with status 200 and employee is added  
+
+**Steps to Reproduce:**
+1. Send a POST request to `/api/Employees`
+2. Use the following body:
+   raw-JSON
+   {
+       "username": "T",
+       "firstName": "John",
+       "lastName": "Doe",
+       "dependants": 5
+   }
+
+### Actual Result:
+- The API responds with 200 OK instead of 400 code.  
+- A new employee record is created with an invalid user name  
+
+### Expected Result:
+- The API should return a 400 Bad Request response with an error message indicating where the error is located.
+
+
+## Bug ID: API-004  
+**Title:** DELETE /api/Employees returns 405 instead of 404 when deleting non-existing employee    
+**Scenario:** 3 Delete Employee
+
+**Severity:** Medium     
+**Endpoint:** https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/Employees
+**Method:** DELETE 
+**Auth:** Basic Auth Header
+**Reported by:** Ernesto Martínez  
+**Date:** 2025-11-12  
+
+**Description:**  
+When attempting to delete a non-existent employee using a valid DELETE request and an invalid ID, the API incorrectly returns status 405 Method Not Allowed instead of 404 Not Found  
+
+**Steps to Reproduce:**
+1. Send a DELETE request to `/api/Employees/00000000-0000-0000-0000-000000000000`  
+2. Observe the status code in the response
+
+### Actual Result:
+- The API returns 405 Method Not Allowed
+
+### Expected Result:
+- The API should return 404 Not Found, indicating the employee record does not exist.
+
+**Notes:**  
+- Behavior consistent across multiple invalid IDs.
+
+
+## Bug ID: API-005  
+**Title:** Second DELETE request on `/api/Employees/{justDeletedId}` returns 200 instead of 404 or 400    
+**Scenario:** 3 Delete Employee
+
+**Severity:** Low     
+**Endpoint:** https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/Employees
+**Method:** DELETE 
+**Auth:** Basic Auth Header
+**Reported by:** Ernesto Martínez  
+**Date:** 2025-11-12  
+
+**Description:**  
+When performing a second DELETE request on the same employee ID, the API returns status 200 OK instead of 404 Not Found or 400 Bad Request. 
+
+**Steps to Reproduce:**
+1. Send a POST request to `/api/Employees` to create a new employee.  
+2. Capture the `id` returned in the response.  
+3. Send a DELETE request to `/api/Employees/{id}`.  
+4. Send the same DELETE request again with the same `id`.
+
+### Actual Result:
+- The API returns 200 OK for both delete attempts.
+
+### Expected Result:
+- The first DELETE should return 200 OK (successful deletion).  
+- The second DELETE should return 404 Not Found or 400 Bad Request, indicating that the resource no longer exists.
+
+**Notes:**  
+- This issue is functionally harmless but semantically incorrect per RESTful standards.  
+- Test case reference: `DELETE Employee again (expected 404/400 Known issue)`
+
+
