@@ -179,3 +179,43 @@ When performing a second DELETE request on the same employee ID, the API returns
 - Test case reference: `DELETE Employee again (expected 404/400 Known issue)`
 
 
+## Bug ID: API-006  
+**Title:** When API input mixed numeric/string dependants returns incorrect status code (Same behavior with empty first name or last name)  
+**Scenario:** 1 Add Employee
+
+**Severity:** Medium     
+**Endpoint:** https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/api/Employees
+**Method:** DELETE 
+**Auth:** Basic Auth Header
+**Reported by:** Ernesto Martínez  
+**Date:** 2025-11-12  
+
+**Description:**  
+When sending a dependants value that begins with valid digits (0–32) but includes additional invalid characters (letters, symbols, mixed string), the API returns 405 Method Not Allowed.
+
+**Steps to Reproduce:**
+1. Send a POST request to `/api/Employees` to create a new employee.
+2. Use a payload where dependants begins with valid digits (0–32) but has invalid trailing characters:
+{
+  "username": "TestUserXYZ",
+  "firstName": "John",
+  "lastName": "Doe",
+  "dependants": "07abK"   // Valid prefix + invalid suffix
+}
+
+### Actual Result:
+- API returns 405 Method Not Allowed
+- Response body is empty
+- No validation error is provided
+
+### Expected Result:
+- API should return 400 Bad Request  
+- Response should include a meaningful validation message such as:
+
+**Notes:**  
+- UI trims string values and only keeps leading digits before submitting to API. Example: "07abK" → UI sends "7"  
+- API currently does not perform input sanitation or trimming.
+- This inconsistency can cause unexpected values when calling the API directly.
+
+
+
