@@ -180,7 +180,7 @@ When performing a second DELETE request on the same employee ID, the API returns
 
 
 ## Bug ID: API-006  
-**Title:** When API input mixed numeric/string dependants returns incorrect status code (Same behavior with empty first name or last name)  
+**Title:** When API input mixed numeric/string dependants returns incorrect status code (Same behavior with empty first name or last name, and inexisting ID)  
 **Scenario:** 1 Add Employee
 
 **Severity:** Medium     
