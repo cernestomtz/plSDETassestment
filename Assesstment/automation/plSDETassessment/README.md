@@ -20,7 +20,6 @@ Before running the project, please ensure the following are installed:
 ###  Java JDK 17+
 Verify with:
 
-```bash
 java -version
 
 ###  Maven 3.8+
