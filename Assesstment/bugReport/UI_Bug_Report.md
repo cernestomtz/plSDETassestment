@@ -424,3 +424,27 @@
 
 ### Expected Result:
 - User should not have any blocker to keep interuacting with UI 
+
+## Bug ID: UI-016 
+**Title:** First name and last name get stored backward
+**Scenario:** 1 Add Employee
+
+**Severity:** High  
+**Environment:** https://wmxrwq14uc.execute-api.us-east-1.amazonaws.com/Prod/Account/Login  
+**Reported by:** Ernesto Martínez  
+**Date:** 2025-11-04  
+
+### Steps to Reproduce:
+1. Navigate to the login page
+2. Enter valid credentials
+3. Click on 'Add Employee' button
+4. Enter 'First Name' and 'Last Name' 
+5. Click on 'Add' button
+6. Verify how first name got stored in last name column, and same with last name
+
+
+### Actual Result:
+- When a user input a new employee, it got store backward
+
+### Expected Result:
+- When a user input a new employee, first name and last name should be stored in the respective column
